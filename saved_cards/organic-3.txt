@@ -1,3 +1,0 @@
-2
-Q: Types of structural representation of Organic Compounds:
-A: Lewis, Dashed, Condensed, Dot
