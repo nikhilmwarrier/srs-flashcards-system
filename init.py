@@ -5,6 +5,7 @@
 # using the SM2+ algorithm (http://www.blueraja.com/blog/477/a-better-spaced-repetition-learning-algorithm-sm2)
 
 import os
+import sys
 import sqlite3
 
 import colorama as col
@@ -12,7 +13,20 @@ import colorama as col
 from time import strftime
 from datetime import date
 from random import randint
-from config.definitions import ROOT_DIR
+from config.definitions import ROOT_DIR as ROOT_DIR_PRESET, BASE_DIR
+
+
+ROOT_DIR = ROOT_DIR_PRESET
+
+try:
+    if sys.argv[1]:
+        ROOT_DIR = os.path.join(BASE_DIR, sys.argv[1]) 
+        try:
+            os.makedirs(ROOT_DIR)
+        except FileExistsError:
+            pass
+except IndexError:
+    ROOT_DIR = ROOT_DIR_PRESET
 
 PERFORMANCE_THRESHOLD = 0.6
 
@@ -84,7 +98,7 @@ def addNewCards(cards_list):
     cards_list_with_difficulty = []
 
     for card in cards_list:
-        _difficulty = open('./new_cards/' + card).read().split('\n')[0]
+        _difficulty = open(os.path.join(ROOT_DIR, "new_cards", card)).read().split('\n')[0]
         try:
             float_difficulty = int(_difficulty) / 10
             float_difficulty = clamp(0.0, 1.0, float_difficulty)
@@ -101,7 +115,7 @@ def addNewCards(cards_list):
     con.commit()
 
     for card in cards_list:
-        os.rename(f"./new_cards/{card}", f"./saved_cards/{card}")
+        os.rename(os.path.join(ROOT_DIR, f"new_cards/{card}"), os.path.join(ROOT_DIR, f"saved_cards/{card}"))
 
 
 def updateCardDetails(performanceRatings):
@@ -121,7 +135,6 @@ def updateCardDetails(performanceRatings):
         if performanceRatings and performanceRatings.get(card, False):
             _isCorrect = 1 if (
                 performanceRatings[card] >= PERFORMANCE_THRESHOLD) else 0
-            print(_isCorrect)
             newPercentOverdue = calculatePercentOverdue(
                 currDateLastReviewed, currDaysBetweenReviews, _isCorrect)
             newDaysBetweenReviews = calculateDaysBetweenReviews(
