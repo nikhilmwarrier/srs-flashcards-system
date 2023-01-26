@@ -23,6 +23,8 @@ cur = con.cursor()
 # cur.execute("DROP TABLE cards")
 # con.commit()
 
+os.makedirs("./new_cards")
+os.makedirs("./saved_cards")
 cur.execute("CREATE TABLE IF NOT EXISTS cards(filename, performanceRating, difficulty, daysBetweenReviews, dateLastReviewed, percentOverdue, difficultyWeight, wasCorrectLastTime)")
 
 # Helper Functions
