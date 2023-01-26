@@ -10,7 +10,7 @@ $ git clone 'https://github.com/nikhilmwarrier/srs-flashcards-system' flashcards
 
 1. Install dependencies
 ```bash
-$ pip install requirements.txt
+$ pip install -r requirements.txt
 ```
 
 2. Add flashcards to the `new_cards` directory. Flashcards are plain text files containing _only three lines_, in the format:
