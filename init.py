@@ -205,11 +205,3 @@ def cardsLoop():
 
 
 cardsLoop()
-
-
-# for card in cards:
-#    (card_data := open(card.path).read().split("\n"))
-#    question = card_data[0]
-#    answer = card_data[1]
-#
-#    print(question, answer, sep="\n")
