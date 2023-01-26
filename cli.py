@@ -12,19 +12,24 @@ import colorama as col
 from time import strftime
 from datetime import date
 from random import randint
+from config.definitions import ROOT_DIR
 
 PERFORMANCE_THRESHOLD = 0.6
 
 col.init(autoreset=True)    # Initialize Colorama
 
-con = sqlite3.connect("cards_data.db")
+con = sqlite3.connect(os.path.join(ROOT_DIR, "cards_data.db"))
 cur = con.cursor()
 
 # cur.execute("DROP TABLE cards")
 # con.commit()
 
-os.makedirs("./new_cards")
-os.makedirs("./saved_cards")
+try:
+    os.makedirs(os.path.join(ROOT_DIR, "new_cards"))
+    os.makedirs(os.path.join(ROOT_DIR, "./saved_cards"))
+except FileExistsError:
+    pass
+
 cur.execute("CREATE TABLE IF NOT EXISTS cards(filename, performanceRating, difficulty, daysBetweenReviews, dateLastReviewed, percentOverdue, difficultyWeight, wasCorrectLastTime)")
 
 # Helper Functions
@@ -114,7 +119,8 @@ def updateCardDetails(performanceRatings):
         wasCorrectLastTime = row_values[7]
 
         if performanceRatings and performanceRatings.get(card, False):
-            _isCorrect = 1 if (performanceRatings[card] >= PERFORMANCE_THRESHOLD) else 0
+            _isCorrect = 1 if (
+                performanceRatings[card] >= PERFORMANCE_THRESHOLD) else 0
             print(_isCorrect)
             newPercentOverdue = calculatePercentOverdue(
                 currDateLastReviewed, currDaysBetweenReviews, _isCorrect)
@@ -155,17 +161,16 @@ def updateCardDetails(performanceRatings):
                 card
             )
 
-            cur.execute("UPDATE cards SET percentOverdue = ? WHERE filename = ?", values) 
+            cur.execute(
+                "UPDATE cards SET percentOverdue = ? WHERE filename = ?", values)
 
         con.commit()
 
 
-new_cards = os.listdir('new_cards')
+new_cards = os.listdir(os.path.join(ROOT_DIR, 'new_cards'))
 
 if len(new_cards) != 0:
     addNewCards(new_cards)
-
-cards = os.scandir('saved_cards')
 
 
 def cardsLoop():
@@ -175,7 +180,8 @@ def cardsLoop():
     performanceRatings_dict = {}
 
     for card in cards:
-        (card_content := open('./saved_cards/' + card[0]).read().split('\n'))
+        (card_content := open(os.path.join(ROOT_DIR,
+         'saved_cards', card[0])).read().split('\n'))
         qn = card_content[1]
         ans = card_content[2]
         print(col.Style.DIM +
