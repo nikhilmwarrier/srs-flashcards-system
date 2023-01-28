@@ -20,7 +20,7 @@ ROOT_DIR = ROOT_DIR_PRESET
 
 try:
     if sys.argv[1]:
-        ROOT_DIR = os.path.join(BASE_DIR, sys.argv[1]) 
+        ROOT_DIR = os.path.join(BASE_DIR, sys.argv[1])
         try:
             os.makedirs(ROOT_DIR)
         except FileExistsError:
@@ -98,7 +98,8 @@ def addNewCards(cards_list):
     cards_list_with_difficulty = []
 
     for card in cards_list:
-        _difficulty = open(os.path.join(ROOT_DIR, "new_cards", card)).read().split('\n')[0]
+        _difficulty = open(os.path.join(
+            ROOT_DIR, "new_cards", card)).read().split('\n')[0]
         try:
             float_difficulty = int(_difficulty) / 10
             float_difficulty = clamp(0.0, 1.0, float_difficulty)
@@ -115,7 +116,8 @@ def addNewCards(cards_list):
     con.commit()
 
     for card in cards_list:
-        os.rename(os.path.join(ROOT_DIR, f"new_cards/{card}"), os.path.join(ROOT_DIR, f"saved_cards/{card}"))
+        os.rename(os.path.join(
+            ROOT_DIR, f"new_cards/{card}"), os.path.join(ROOT_DIR, f"saved_cards/{card}"))
 
 
 def updateCardDetails(performanceRatings):
@@ -214,7 +216,12 @@ def cardsLoop():
         updateCardDetails(performanceRatings_dict)
     else:
         updateCardDetails(False)
-    print(col.Style.BRIGHT + col.Fore.CYAN + "\n\nAll done for today!")
+
+    if len(cur.execute("SELECT * FROM cards WHERE percentOverdue >= 0.9 ORDER BY percentOverdue DESC").fetchall()) != 0:
+        print(col.Style.BRIGHT + col.Fore.CYAN + "Next Round!")
+        cardsLoop()
+    else:
+        print(col.Style.BRIGHT + col.Fore.CYAN + "\n\nAll done for today!")
 
 
 cardsLoop()
